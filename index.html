@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8" />
+  <title>Vedio Voice Repeater (影音跟读者)V1</title>
+
+<style type="text/css">
+body{
+background: #f5faff;
+}
+html, body { margin: 1; padding:0; }
+html, body,tb, content{ height: 100%; }
+.button{
+width: 100px;
+line-height: 25px;
+text-align: center;
+font-weight: bold;
+color: #fff;
+text-shadow:1px 1px 1px #333;
+border-radius: 5px;
+margin:5px 1px 5px 1px;
+position: relative;
+overflow: hidden;
+}
+.button:nth-child(6n){
+margin-right: 0;
+}
+.button.yellow{
+border:1px solid #d2a000;
+box-shadow: 0 1px 2px #fedd71 inset,0 -1px 0 #a38b39 inset,0 -2px 3px #fedd71 inset;
+background: -webkit-linear-gradient(top,#fece34,#d8a605);
+background: -moz-linear-gradient(top,#fece34,#d8a605);
+background: linear-gradient(top,#fece34,#d8a605);
+}
+.button.green{
+border:1px solid #64c878;
+box-shadow: 0 1px 2px #b9ecc4 inset,0 -1px 0 #6c9f76 inset,0 -2px 3px #b9ecc4 inset;
+background: -webkit-linear-gradient(top,#90dfa2,#84d494);
+background: -moz-linear-gradient(top,#90dfa2,#84d494);
+background: linear-gradient(top,#90dfa2,#84d494);
+}
+.button.blue{
+border:1px solid #1e7db9;
+box-shadow: 0 1px 2px #8fcaee inset,0 -1px 0 #497897 inset,0 -2px 3px #8fcaee inset;
+background: -webkit-linear-gradient(top,#42a4e0,#2e88c0);
+background: -moz-linear-gradient(top,#42a4e0,#2e88c0);
+background: linear-gradient(top,#42a4e0,#2e88c0);
+}
+.round,
+    .side,
+    .tags{
+padding-right: 30px;
+}
+.round:after{
+position: absolute;
+display: inline-block;
+content: "\003c";
+top:50%;
+right:10px;
+margin-top: -10px;
+width: 17px;
+height: 20px;
+padding-left: 3px;
+line-height:18px;
+font-size: 10px;
+font-weight: normal;
+border-radius: 10px;
+text-shadow:-2px 0 1px #333;
+-webkit-transform:rotate(-90deg);
+-moz-transform:rotate(-90deg);
+transform:rotate(-90deg);
+}
+.yellow:active{
+top:1px;
+box-shadow: 0 1px 3px #816b1f inset,0 3px 0 #fff;
+background: -webkit-linear-gradient(top,#d3a203,#dba907);
+background: -moz-linear-gradient(top,#d3a203,#dba907);
+background: linear-gradient(top,#d3a203,#dba907);
+}
+.green:active{
+top:1px;
+box-shadow: 0 1px 3px #4d7254 inset,0 3px 0 #fff;
+background: -webkit-linear-gradient(top,#5eac6e,#72b37e);
+background: -moz-linear-gradient(top,#5eac6e,#72b37e);
+background: linear-gradient(top,#5eac6e,#72b37e);
+}
+.blue:active{
+top:1px;
+box-shadow: 0 1px 3px #114566 inset,0 3px 0 #fff;
+background: -webkit-linear-gradient(top,#1a71a8,#1976b1);
+background: -moz-linear-gradient(top,#1a71a8,#1976b1);
+background: linear-gradient(top,#1a71a8,#1976b1);
+}
+</style>
+
+<style type="text/css">
+video::cue{
+background-color:transparent;
+color: yellow;
+text-shadow: 0 1px #000, 1px 0 #000, -1px 0 #000, 0 -1px #000;
+font-size:66px;
+}
+</style>
+
+<style>
+.divpad{ padding:0px 0px 0px 0px;
+      text-align:justify;}
+.img{
+width: 30px;
+height: 30px;
+}
+</style>
+
+<style type="text/css">
+.text{
+height:10px;
+width:10px;
+}
+</style>
+
+</head>
+
+
+<body>
+
+<table id="tb" width="100%" height="75%" border="1" cellpadding="0" cellspacing="0">
+<tr height="80%" align="center">
+ <td width="75%"><video id="video" src="2.mp4"  width="90%" type="video/mp4" controls="controls"></video>
+</td>
+ <td width="25%"><textarea id="content" value="abc" onclick="strClick()" style="font-size:12px; color:#F00; width:95%; height:97%" wrap="off">导入或粘贴入-srt字幕文件</textarea></td>
+</tr>
+
+<tr height="5%">
+ <td>
+     <input type= "file"  id= "fileMp4" style= "display:none"  onchange= "changeAgentContent()"  />
+     <input type= "text"  value= ""  disabled id= "inputFileAgent"  />
+     <input type= "button"  onclick= "document.getElementById('fileMp4').click()"  value= "导入视频"  />
+
+     倍速：<select id="Vrate">
+       <option value="0.3">0.3</option>
+       <option value="0.5">0.5</option>
+       <option value="0.7">0.7</option>
+       <option value="0.9">0.9</option>
+       <option value="1.0" selected="selected">1</option>
+       <option value="1.2">1.2</option>
+       <option value="1.4">1.4</option>
+       <option value="1.5">1.5</option>
+       <option value="1.7">1.7</option>
+       <option value="2.0">2.0</option>
+       <option value="2.5">2.5</option>
+       <option value="3">3</option>
+     </select>
+
+     <button id="bntStart" class="button yellow" onclick="restart();">▷▷ start (s)</button>
+     <button id="bntPlay" class="button green" onclick="replay();">PlayAgain (p)</button>
+     <button id="bntNext" class="button blue" onclick="next();">Next ▶▶ (n)</button>
+     <input id="line1" value="0" style="width:30px; height:15px;" /> 
+
+
+ </td>
+ <td> 
+   <input type= "file"  id= "fileSrt" style= "display:none" onchange="changeAgentContent2()" />
+   <input type= "text"  value= ""  disabled id= "inputFileAgent2"  />
+   <input type= "button" onclick="document.getElementById('fileSrt').click()" value= "导入srt"  />
+ </td>
+</tr>
+</table>
+
+
+<table width="100%" border="1" cellpadding="0" cellspacing="0">
+<tr>
+
+ <td width="5%" class="divpad">原文：</td>
+ <td width="70%"><div id = "srtText">This is Demo Text.</div></td>
+ <td colspan="2">&nbsp;字号:
+  <select id="Fz" onChange="javascript:ChangeFontSize();">
+   <option value="10">10</option>
+   <option value="13">13</option>
+   <option value="16">16</option>
+   <option value="19">19</option>
+   <option value="22">22</option>
+   <option value="25" selected>25</option>
+   <option value="28">28</option>
+   <option value="31">31</option>
+   <option value="34">34</option>
+   <option value="37">37</option>
+   <option value="40">40</option>
+  </select>
+
+&nbsp;&nbsp;&nbsp;&nbsp;字幕整体延迟<input id="Lates" type="text" value="0" style="width:30px; height:15px;" />秒播放</td>
+</tr>
+
+<tr>
+ <td class="divpad">跟读：</td>
+ <td>
+  <div id="info"></div>
+  <div id="results">
+    <span id="final_span" class="final"></span>
+    <span id="interim_span" class="interim"></span>
+  </div>
+ </td>
+ <td width="40px" align="left">
+   <div>
+    <button style="background:rgba(0,0,0,0);border:none;width: 30px; height: 30px;" id="start_button" onclick="startButton(event)"><img id="start_img" src="pic/1.gif" class="img" alt="Start"></button>
+    </div>
+ </td>
+ <td> 
+   <div id="div_language">
+     <select id="select_language" onchange="updateCountry()"></select>
+     <select id="select_dialect"></select></div>
+ </td>
+ </tr>
+</table>
+
+<table width="100%" border="1" cellpadding="0" cellspacing="0" style="table-layout:fixed">
+<tr align="center">
+ <td width="20%">操作指南</td>
+ <td width="20%">启蒙学习</td>
+ <td width="20%">磨 耳 朵</td>
+ <td width="20%">特色服务</td>
+ <td width="20%">版本信息</td>
+</tr>
+</table>
+
+
+<script>
+document.onkeyup = function () {
+ if(event.keyCode==83){
+   restart();
+  }
+ if(event.keyCode==80){
+   replay();
+  }
+ if(event.keyCode==78){
+   next();
+  }
+}
+</script>
+
+<script type= "text/javascript" >
+ function  changeAgentContent(){
+    document.getElementById("inputFileAgent" ).value = document.getElementById("fileMp4").value;
+    var file = document.getElementById('fileMp4').files[0];  
+    var url = URL.createObjectURL(file);  
+    document.getElementById("video").src = url;  
+ }
+ function changeAgentContent2(){
+    document.getElementById( "inputFileAgent2" ).value = document.getElementById("fileSrt").value;
+    var file1 = document.getElementById('fileSrt');
+    var file = file1.files[0];
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function () {document.getElementById('content').innerHTML = reader.result;}
+ }
+</script>
+
+
+<script>
+ document.getElementById("srtText").style.fontSize =25+'px';
+ document.getElementById("info").style.fontSize =25+'px';
+ document.getElementById("results").style.fontSize =25+'px';
+ function ChangeFontSize() {
+  document.getElementById("srtText").style.fontSize =document.getElementById("Fz").value+'px';
+  document.getElementById("info").style.fontSize =document.getElementById("Fz").value+'px';
+  document.getElementById("results").style.fontSize =document.getElementById("Fz").value+'px';
+ }
+</script> 
+
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.1.min.js"></script>
+
+<script type="text/javascript" >
+var t=document.getElementById("content");
+var n;
+
+t.onclick=function(){
+   var v=this.value;
+   var cv="";
+   var frow=0;
+   if("selectionStart" in t){
+     cv=v.substr(0,t.selectionStart);}
+   else{
+     var oSel=document.selection.createRange();
+     oSel.moveStart('character',-t.value.length);
+     cv=oSel.text;}
+
+   var c1=cv.split('\n').length-1
+       n=c1
+   var text=$("#content").val();
+   var array=text.split("\n");
+
+var i=0;
+var rightRow=0;
+for(i=0; i<=8; i++){
+    if (!isNaN(parseFloat(array[n-i])) && isFinite(array[n-i])){
+      rightRow=n-i+2;
+      document.getElementById("line1").value=rightRow-2;
+      break;
+    }
+}
+
+var sentc=""+array[rightRow];
+var txt=document.getElementById("content").value;
+var arr=txt.split("\n").length;
+
+for (var j=1;j<=6;j++){
+ if((rightRow+j)>=(arr-1)){
+   break;
+  }
+ else{
+    if (!isNaN(parseFloat(array[rightRow+j])) && isFinite(array[rightRow+j])){
+     break;
+    }
+    else{
+     sentc=sentc+" "+array[rightRow+j]
+    }
+  }
+}
+document.getElementById("srtText").innerHTML=sentc;
+  vdplay();
+}
+
+
+</script>
+
+
+<script>
+function restart(){
+  document.getElementById("final_span").innerHTML="";
+  document.getElementById("line1").value=0;
+  t.scrollTop =0
+  vdplay();
+}
+
+function replay(){
+  document.getElementById("final_span").innerHTML="";
+  var cnt0=t.value.split("\n").length;
+  t.scrollTop = parseFloat(document.getElementById("line1").value)*(t.scrollHeight)/cnt0;
+  vdplay();
+}
+
+function next(){
+  document.getElementById("final_span").innerHTML="";
+  var j=0;
+  var nrow=parseInt(document.getElementById("line1").value);
+  var txt=document.getElementById("content").value;
+  var arr=txt.split("\n");
+  var count = arr.length;
+if((nrow+4)<(count-2)){
+  for (j=0;j<=7;j++){
+    if (!isNaN(parseFloat(arr[nrow+4+j])) && isFinite(arr[nrow+4+j])){
+     break;
+    }
+  }
+  document.getElementById("line1").value=nrow+4+j;
+  var cnt0=t.value.split("\n").length;
+  t.scrollTop = parseFloat(document.getElementById("line1").value)*(t.scrollHeight)/cnt0;
+  vdplay();
+}
+else{
+  document.getElementById("line1").value=0;
+  t.scrollTop = 0;
+  vdplay();
+    }
+}
+
+
+var myVideo = document.getElementById("video");
+var subtitles = myVideo.addTextTrack("subtitles", "text","en");
+subtitles.mode = "showing"
+var cue = new VTTCue(0.0,0.0,"00");
+subtitles.addCue(cue);
+
+function vdplay(){
+ playv=parseFloat(document.getElementById("Vrate").value);
+ playl=parseFloat(document.getElementById("Lates").value);
+ playrow=parseInt(document.getElementById("line1").value);
+ var txt=document.getElementById("content").value;
+ var arr=txt.split("\n");
+ var alen=arr.length;
+
+var sentc=""+arr[playrow+2];
+
+for (var j=1;j<=6;j++){
+  if((playrow+2+j)>=(alen-1)){ break;}
+  if (!isNaN(parseFloat(arr[playrow+2+j])) && isFinite(arr[playrow+2+j])){
+     break;
+    }
+    else{
+     sentc=sentc+" "+arr[playrow+2+j]
+    }
+  }
+document.getElementById("srtText").innerHTML=sentc;
+
+
+ playstime=arr[playrow+1].slice(0,13);
+  sta=parseInt(playstime.slice(0,2));
+  stb=parseInt(playstime.slice(3,5));
+  stc=parseInt(playstime.slice(6,8));
+  std=parseInt(playstime.slice(9,12));
+  stm=sta*3600+stb*60+stc+std/1000+playl;
+
+ playetime=arr[playrow+1].slice(17,29);
+  eta=parseInt(playetime.slice(0,2));
+  etb=parseInt(playetime.slice(3,5));
+  etc=parseInt(playetime.slice(6,8));
+  etd=parseInt(playetime.slice(9,12));
+  etm=eta*3600+etb*60+etc+etd/1000+playl;
+
+subtitles.removeCue(cue);
+cue = new VTTCue(stm,etm+1,sentc);
+subtitles.addCue(cue);
+
+
+ myVideo.playbackRate =playv;
+ myVideo.currentTime=stm;
+ myVideo.play();
+ myVideo.addEventListener("timeupdate",timeupdate); 
+}
+
+
+function timeupdate(){ 
+var time = myVideo.currentTime+""; 
+var ts = time.substring(0,time.indexOf(".")+2); 
+if(Number(ts) > Number(etm)){
+ myVideo.pause();
+ } 
+} 
+</script>
+
+
+
+<script>
+var langs =
+[['Afrikaans',       ['af-ZA']],
+ ['Català',          ['ca-ES']],
+ ['Čeština',         ['cs-CZ']],
+ ['Deutsch',         ['de-DE']],
+ ['English',         ['en-AU', 'Australia'],
+                     ['en-CA', 'Canada'],
+                     ['en-IN', 'India'],
+                     ['en-NZ', 'New Zealand'],
+                     ['en-ZA', 'South Africa'],
+                     ['en-GB', 'United Kingdom'],
+                     ['en-US', 'United States']],
+ ['Español',         ['es-AR', 'Argentina'],
+                     ['es-BO', 'Bolivia'],
+                     ['es-CL', 'Chile'],
+                     ['es-CO', 'Colombia'],
+                     ['es-CR', 'Costa Rica'],
+                     ['es-EC', 'Ecuador'],
+                     ['es-SV', 'El Salvador'],
+                     ['es-ES', 'España'],
+                     ['es-US', 'Estados Unidos'],
+                     ['es-GT', 'Guatemala'],
+                     ['es-HN', 'Honduras'],
+                     ['es-MX', 'México'],
+                     ['es-NI', 'Nicaragua'],
+                     ['es-PA', 'Panamá'],
+                     ['es-PY', 'Paraguay'],
+                     ['es-PE', 'Perú'],
+                     ['es-PR', 'Puerto Rico'],
+                     ['es-UY', 'Uruguay'],
+                     ['es-VE', 'Venezuela']],
+ ['Euskara',         ['eu-ES']],
+ ['Français',        ['fr-FR']],
+ ['Galego',          ['gl-ES']],
+ ['Hrvatski',        ['hr_HR']],
+ ['IsiZulu',         ['zu-ZA']],
+ ['Íslenska',        ['is-IS']],
+ ['Italiano',        ['it-IT', 'Italia'],
+                     ['it-CH', 'Svizzera']],
+ ['Magyar',          ['hu-HU']],
+ ['Nederlands',      ['nl-NL']],
+ ['Norsk bokmål',    ['nb-NO']],
+ ['Polski',          ['pl-PL']],
+ ['Português',       ['pt-BR', 'Brasil'],
+                     ['pt-PT', 'Portugal']],
+ ['Română',          ['ro-RO']],
+ ['Slovenčina',      ['sk-SK']],
+ ['Suomi',           ['fi-FI']],
+ ['Svenska',         ['sv-SE']],
+ ['Türkçe',          ['tr-TR']],
+ ['български',       ['bg-BG']],
+ ['Pусский',         ['ru-RU']],
+ ['Српски',          ['sr-RS']],
+ ['한국어',            ['ko-KR']],
+ ['中文',             ['cmn-Hans-CN', '普通话-大陆'],
+                     ['cmn-Hans-HK', '普通话-香港'],
+                     ['cmn-Hant-TW', '中文-台灣'],
+                     ['yue-Hant-HK', '粵語-香港']],
+ ['日本語',           ['ja-JP']],
+ ['Lingua latīna',   ['la']]];
+
+for (var i = 0; i < langs.length; i++) {
+  select_language.options[i] = new Option(langs[i][0], i);
+}
+select_language.selectedIndex = 4;
+updateCountry();
+select_dialect.selectedIndex = 6;
+showInfo('info_start');
+
+function updateCountry() {
+  for (var i = select_dialect.options.length - 1; i >= 0; i--) {
+    select_dialect.remove(i);
+  }
+  var list = langs[select_language.selectedIndex];
+  for (var i = 1; i < list.length; i++) {
+    select_dialect.options.add(new Option(list[i][1], list[i][0]));
+  }
+  select_dialect.style.visibility = list[1].length == 1 ? 'hidden' : 'visible';
+}
+
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+var start_timestamp;
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
+} else {
+  start_button.style.display = 'inline-block';
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = function() {
+    recognizing = true;
+    showInfo('info_speak_now');
+    start_img.src = 'pic/2.gif';
+  };
+
+  recognition.onerror = function(event) {
+    if (event.error == 'no-speech') {
+      start_img.src = 'pic/1.gif';
+      showInfo('info_no_speech');
+      ignore_onend = true;
+    }
+    if (event.error == 'audio-capture') {
+      start_img.src = 'pic/1.gif';
+      showInfo('info_no_microphone');
+      ignore_onend = true;
+    }
+    if (event.error == 'not-allowed') {
+      if (event.timeStamp - start_timestamp < 100) {
+        showInfo('info_blocked');
+      } else {
+        showInfo('info_denied');
+      }
+      ignore_onend = true;
+    }
+  };
+
+  recognition.onend = function() {
+    recognizing = false;
+    if (ignore_onend) {
+      return;
+    }
+    start_img.src = 'pic/1.gif';
+    if (!final_transcript) {
+      showInfo('info_start');
+      return;
+    }
+    showInfo('');
+  };
+
+  recognition.onresult = function(event) {
+    var interim_transcript = '';
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+      }
+    }
+    final_transcript = capitalize(final_transcript);
+    final_span.innerHTML = linebreak(final_transcript);
+    interim_span.innerHTML = linebreak(interim_transcript);
+    if (final_transcript || interim_transcript) {
+      showButtons('inline-block');
+    }
+  };
+}
+
+function upgrade() {
+  start_button.style.visibility = 'hidden';
+  showInfo('info_upgrade');
+}
+
+var two_line = /\n\n/g;
+var one_line = /\n/g;
+function linebreak(s) {
+  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+}
+
+var first_char = /\S/;
+function capitalize(s) {
+  return s.replace(first_char, function(m) { return m.toUpperCase(); });
+}
+
+function createEmail() {
+  var n = final_transcript.indexOf('\n');
+  if (n < 0 || n >= 80) {
+    n = 40 + final_transcript.substring(40).indexOf(' ');
+  }
+  var subject = encodeURI(final_transcript.substring(0, n));
+  var body = encodeURI(final_transcript.substring(n + 1));
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+}
+
+
+
+function hasSpecialChar(str){
+return /[@$!#$%^&*(){},?.'";:~` ]/.test(str);
+}
+
+
+function startButton(event) {
+  if (recognizing) {
+    var wordcnt=0;
+    var wordsam=0;
+    var docnt=1;
+    var cp2="";
+    var c1="";
+    var c2="";
+    var words1=document.getElementById("srtText");
+    var s1=words1.innerText;
+    var words2=document.getElementById("final_span");
+    var s2=words2.innerText;
+    var sentlen=s2.length;
+    var k1=0;
+    var k2=0;
+   do{
+      var word1="";
+      var word2="";
+      for(var i=0;i<20;i++){
+       c2=s2.slice(k2,k2+1);
+       if(!hasSpecialChar(c2)){
+         word2=word2+c2;
+         k2=k2+1;
+         docnt++;
+        }
+       else{
+         k2=k2+1;
+         docnt++;
+
+         for(var p=1;p<5;p++){
+          c2=s2.slice(k2,k2+1);
+          if(hasSpecialChar(c2)){
+            k2=k2+1;
+           }
+           else{
+             break;}
+          }
+         break;
+        }
+      }
+
+      for(var j=0;j<20;j++){
+       c1=s1.slice(k1,k1+1);
+       if(!hasSpecialChar(c1)){
+         word1=word1+c1;
+         k1=k1+1;
+        }
+       else{
+         k1=k1+1; 
+         for(var l=1;l<5;l++){
+          c1=s1.slice(k1,k1+1);
+          if(hasSpecialChar(c1)){
+            k1=k1+1;
+           }
+           else{
+              break;}
+          }
+        break;
+       }
+      }
+
+    if(word1.toLowerCase()==word2.toLowerCase()){
+      cp2=cp2+" "+word2;
+      wordcnt++;
+      wordsam++;
+     }
+    else{
+      cp2=cp2+" "+"<b>"+word2+"</b>";
+      wordcnt++;
+     }
+
+
+   }while(docnt<sentlen);
+
+   words2.innerHTML= cp2;
+
+if(wordsam==wordcnt)
+{alert("Excel!");}
+else if(wordsam/wordcnt>0.8)
+  {alert("Good!");}
+else
+  {alert("Try again!");}
+
+
+
+    recognition.stop();
+    return;
+  }
+
+  final_transcript = '';
+  recognition.lang = select_dialect.value;
+  recognition.start();
+  ignore_onend = false;
+  final_span.innerHTML = '';
+  interim_span.innerHTML = '';
+  start_img.src = 'pic/2.gif';
+  showInfo('info_allow');
+  showButtons('none');
+  start_timestamp = event.timeStamp;
+}
+
+function showInfo(s) {
+  if (s) {
+    for (var child = info.firstChild; child; child = child.nextSibling) {
+      if (child.style) {
+        child.style.display = child.id == s ? 'inline' : 'none';
+      }
+    }
+    info.style.visibility = 'visible';
+  } else {
+    info.style.visibility = 'hidden';
+  }
+}
+
+var current_style;
+function showButtons(style) {
+  if (style == current_style) {
+    return;
+  }
+  current_style = style;
+  copy_button.style.display = style;
+  email_button.style.display = style;
+  copy_info.style.display = 'none';
+  email_info.style.display = 'none';
+}
+</script>
+
+
+</body>
+</html>
